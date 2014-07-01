@@ -52,6 +52,8 @@ func TestDijkstra(t *testing.T) {
 	testDijkstra('E', 'B', 3, g, t)
 	testDijkstra('E', 'C', 7, g, t)
 	testDijkstra('A', 'A', UINT_MAX, g, t)
+	testDijkstra('B', 'C', 4, g, t)
+	testDijkstra('B', 'E', 6, g, t)
 	testDijkstra('B', 'B', 9, g, t)
 }
 

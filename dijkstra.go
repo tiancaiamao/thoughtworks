@@ -25,8 +25,8 @@ func (g *Graph) Dijkstra(s, t byte) uint {
 	for e := g.Edges[v1]; e != nil; e = e.Next {
 		dist[e.ToVertex] = e.Weight
 	}
-	known[v1] = struct{}{}
-	last := v1
+
+	last := -1
 
 	for last != v2 {
 		// select next vertex from the unknown vertex minimizing dist
