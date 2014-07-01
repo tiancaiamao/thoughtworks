@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func BruteForceNStops(g *Graph, N int, start byte, end byte) (int, int) {
 	within := 0
 	exactly := 0
@@ -58,9 +56,7 @@ func bruteForceDistanceRecur(g *Graph, dist int, v1 int, v2 int, self bool) int 
 	if !self {
 		if v1 == v2 {
 			ret++
-			fmt.Printf("*****")
 		}
-		fmt.Printf("dist remain %d, v=%c\n", dist, g.Vertexs[v1])
 	}
 
 	for e := g.Edges[v1]; e != nil; e = e.Next {
