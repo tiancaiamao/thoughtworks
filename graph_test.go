@@ -16,7 +16,7 @@ func dfs(g *Graph, v int, visited []bool) {
 		return
 	}
 
-	fmt.Printf("%c", g.Nodes[v])
+	fmt.Printf("%c", g.Vertexs[v])
 	visited[v] = true
 
 	for e := g.Edges[v]; e != nil; e = e.Next {

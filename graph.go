@@ -12,14 +12,14 @@ type Edge struct {
 
 type Graph struct {
 	Edges       []*Edge      // adjacency info
-	Nodes       []byte       // for DEBUG ONLY, not needed actually
+	Vertexs       []byte       // for DEBUG ONLY, not needed actually
 	Name2Vertex map[byte]int // map Node name to Vertex
 }
 
 func NewGraph() *Graph {
 	ret := new(Graph)
 	ret.Edges = make([]*Edge, 0, 10)
-	ret.Nodes = make([]byte, 0, 10)
+	ret.Vertexs = make([]byte, 0, 10)
 	ret.Name2Vertex = make(map[byte]int)
 	return ret
 }
@@ -28,7 +28,7 @@ func (g *Graph) addVertex(name byte) {
 	if _, ok := g.Name2Vertex[name]; !ok {
 		g.Name2Vertex[name] = len(g.Edges)
 		g.Edges = append(g.Edges, nil)
-		g.Nodes = append(g.Nodes, name)
+		g.Vertexs = append(g.Vertexs, name)
 	}
 }
 
@@ -67,5 +67,4 @@ func (g *Graph) AddEdge(from byte, to byte, weight uint) {
 
 
 func main() {
-
 }
