@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func DFS(g *Graph) {
@@ -24,7 +24,7 @@ func dfs(g *Graph, v int, visited []bool) {
 	}
 }
 
-func TestGraph(t *testing.T) {
+func makeGraph() *Graph {
 	g := NewGraph()
 	g.AddEdge('A', 'B', 5)
 	g.AddEdge('B', 'C', 4)
@@ -36,5 +36,27 @@ func TestGraph(t *testing.T) {
 	g.AddEdge('E', 'B', 3)
 	g.AddEdge('A', 'E', 7)
 
+	return g
+}
+
+func TestGraph(t *testing.T) {
+	g := makeGraph()
 	DFS(g)
+}
+
+func TestDijkstra(t *testing.T) {
+	g := makeGraph()
+
+	testDijkstra('A', 'B', 5, g, t)
+	testDijkstra('B', 'A', UINT_MAX, g, t)
+	testDijkstra('E', 'B', 3, g, t)
+	testDijkstra('E', 'C', 7, g, t)
+	testDijkstra('A', 'A', UINT_MAX, g, t)
+	testDijkstra('B', 'B', 9, g, t)
+}
+
+func testDijkstra(start byte, to byte, value uint, g *Graph, t *testing.T) {
+	if g.Dijkstra(start, to) != value {
+		t.Errorf("dijkstra...(%c, %c)\n", start, to)
+	}
 }
