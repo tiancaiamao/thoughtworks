@@ -15,3 +15,10 @@ func TestBruteForceStop(t *testing.T) {
 		t.Errorf("BruteForceNStop error, case (A C)")
 	}
 }
+
+func TestBruteForceDistance(t *testing.T) {
+	g := makeGraph()
+	if BruteForceDistance(g, 30, 'C', 'C') != 7 {
+		t.Errorf("BruteForceDistance error...")
+	}
+}

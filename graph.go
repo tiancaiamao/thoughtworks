@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+// "fmt"
 )
 
 type Edge struct {
@@ -12,7 +12,7 @@ type Edge struct {
 
 type Graph struct {
 	Edges       []*Edge      // adjacency info
-	Vertexs       []byte       // for DEBUG ONLY, not needed actually
+	Vertexs     []byte       // for DEBUG ONLY, not needed actually
 	Name2Vertex map[byte]int // map Node name to Vertex
 }
 
@@ -63,8 +63,6 @@ func (g *Graph) AddEdge(from byte, to byte, weight uint) {
 
 	g.addEdge(vert1, vert2, weight)
 }
-
-
 
 func main() {
 }
