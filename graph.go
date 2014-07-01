@@ -63,6 +63,3 @@ func (g *Graph) AddEdge(from byte, to byte, weight uint) {
 
 	g.addEdge(vert1, vert2, weight)
 }
-
-func main() {
-}
