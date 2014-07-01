@@ -111,41 +111,45 @@ func ParseGraph(input []byte) (*Graph, error) {
 
 // example input: "C to C with a distance of less than 30."
 func parseQuest4(line []byte, id int) (Problem, error) {
-	err := errFormat
 	ret := new(Quest4)
 	ret.id = id
 
 	if line[0] < 'A' || line[0] > 'Z' {
-		return nil, err
+		return nil, errFormat
 	}
 	ret.from = line[0]
 	line = line[1:]
 
 	str := " to "
 	if !bytes.HasPrefix(line, []byte(str)) {
-		return nil, err
+		return nil, errFormat
 	}
 	line = line[len(str):]
 
 	if line[0] < 'A' || line[0] > 'Z' {
-		return nil, err
+		return nil, errFormat
 	}
 	ret.to = line[0]
 	line = line[1:]
 
 	str = " with a distance of less than "
 	if !bytes.HasPrefix(line, []byte(str)) {
-		return nil, err
+		return nil, errFormat
 	}
 	line = line[len(str):]
 
 	idx := bytes.IndexByte(line, '.')
 	if idx != len(line)-1 {
-		return nil, err
+		return nil, errFormat
 	}
 
-	ret.dist, err = strconv.Atoi(string(line[:idx]))
-	return ret, nil
+	dist, err := strconv.Atoi(string(line[:idx]))
+	if err != nil || dist < 0 {
+		return nil, errFormat
+	}
+
+	ret.dist = dist
+	return ret, err
 }
 
 // example input: "A to B."
@@ -214,8 +218,12 @@ func parseQuest2(line []byte, id int) (Problem, error) {
 	}
 
 	// parse stops
-	idx := bytes.Index(line, []byte(" stops."))
+	str = " stops."
+	idx := bytes.Index(line, []byte(str))
 	if idx == -1 {
+		return nil, err
+	}
+	if idx+len(str) != len(line) {
 		return nil, err
 	}
 	ret.stops, err = strconv.Atoi(string(line[:idx]))
