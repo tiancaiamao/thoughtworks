@@ -23,7 +23,7 @@ const inputQuestion string = `1. The distance of the route A-B-C.
 10.The number of different routes from C to C with a distance of less than 30.`
 
 func usage() {
-	fmt.Println("usage: trains graphFile questionFile")
+	fmt.Fprintf(os.Stderr, "usage: trains graphFile questionFile")
 	os.Exit(-1)
 }
 
@@ -48,7 +48,7 @@ func main() {
 func Process(inputGraph, inputQuestion []byte) {
 	g, err := MakeGraph(inputGraph)
 	if err != nil {
-		fmt.Errorf("%v", err)
+		fmt.Fprintf(os.Stderr, "%v", err)
 		return
 	}
 
@@ -78,14 +78,28 @@ func MakeGraph(input []byte) (*Graph, error) {
 			return nil, err
 		}
 
-		c, err := strconv.Atoi(string(input[2:]))
+		input = input[2:]
+		idx := bytes.IndexFunc(input, func(r rune) bool {
+			if r < '0' || r > '9' {
+				return true
+			}
+			return false
+		})
+
+		var c int
+		var err error
+		if idx == -1 {
+			c, err = strconv.Atoi(string(input))
+		} else {
+			c, err = strconv.Atoi(string(input[:idx]))
+		}
+
 		if err != nil {
 			return nil, err
 		}
-
 		g.AddEdge(a, b, uint(c))
 
-		idx := bytes.IndexByte(input, ',')
+		idx = bytes.IndexByte(input, ',')
 		if idx > 0 {
 			input = input[idx+1:]
 		} else {
@@ -102,23 +116,23 @@ func Solve(line []byte, g *Graph) {
 	quest4 := []byte("The number of different routes from ")
 	idx := bytes.Index(line, []byte{'.'})
 	if idx == -1 {
-		fmt.Errorf("I have no idea what you are talking about")
+		fmt.Fprintf(os.Stderr, "I have no idea what you are talking about")
 		return
 	}
 
 	num, err := strconv.Atoi(string(line[:idx]))
 	if err != nil {
-		fmt.Errorf("I have no idea what you are talking about")
+		fmt.Fprintf(os.Stderr, "I have no idea what you are talking about")
 		return
 	}
 
-	line = bytes.TrimSpace(line[:idx+1])
+	line = bytes.TrimSpace(line[idx+1:])
 
 	if bytes.HasPrefix(line, quest1) {
 		line = line[len(quest1):]
 		input, err := ParseQuest1(line)
 		if err != nil {
-			fmt.Errorf("%v", err)
+			fmt.Fprintf(os.Stderr, "%v", err)
 			return
 		}
 
@@ -127,7 +141,7 @@ func Solve(line []byte, g *Graph) {
 		line = line[len(quest2):]
 		input, err := ParseQuest2(line)
 		if err != nil {
-			fmt.Errorf("%v", err)
+			fmt.Fprintf(os.Stderr, "%v", err)
 			return
 		}
 		SolveQuest2(input, num, g)
@@ -135,7 +149,7 @@ func Solve(line []byte, g *Graph) {
 		line = line[len(quest3):]
 		from, to, err := ParseQuest3(line)
 		if err != nil {
-			fmt.Errorf("%v", err)
+			fmt.Fprintf(os.Stderr, "%v", err)
 			return
 		}
 		SolveQuest3(from, to, num, g)
@@ -143,10 +157,12 @@ func Solve(line []byte, g *Graph) {
 		line = line[len(quest4):]
 		input, err := ParseQuest4(line)
 		if err != nil {
-			fmt.Errorf("%v", err)
+			fmt.Fprintf(os.Stderr, "%v", err)
 			return
 		}
 		SolveQuest4(input, num, g)
+	} else {
+		fmt.Fprintf(os.Stderr, "I have no idea what you are talking about")
 	}
 }
 
@@ -189,7 +205,7 @@ func ParseQuest4(line []byte) (ret *Quest4, err error) {
 
 func SolveQuest4(input *Quest4, num int, g *Graph) {
 	n := BruteForceDistance(g, input.dist, input.from, input.to)
-	fmt.Println("Output #%d: %d\n", num, n)
+	fmt.Printf("Output #%d: %d\n", num, n)
 }
 
 // example input: "A to B."
@@ -215,9 +231,9 @@ func ParseQuest3(line []byte) (from byte, to byte, err error) {
 func SolveQuest3(from byte, to byte, num int, g *Graph) {
 	dist := g.Dijkstra(from, to)
 	if dist == UINT_MAX {
-		fmt.Println("Output #%d: NO SUCH ROUTE\n", num)
+		fmt.Printf("Output #%d: NO SUCH ROUTE\n", num)
 	} else {
-		fmt.Println("Output #%d: %d\n", num, dist)
+		fmt.Printf("Output #%d: %d\n", num, dist)
 	}
 }
 
@@ -252,27 +268,28 @@ func ParseQuest2(line []byte) (*Quest2, error) {
 	ret.end = line[0]
 	line = line[1:]
 	str = " with "
+
 	if !bytes.HasPrefix(line, []byte(str)) {
 		return nil, err
 	}
-	line = line[:len(str)]
+	line = line[len(str):]
 
 	// parse type
 	maximum := "a maximum of "
 	exactly := "exactly "
 	if bytes.HasPrefix(line, []byte(maximum)) {
 		ret.exactly = false
-		line = line[:len(exactly)]
+		line = line[len(maximum):]
 	} else if bytes.HasPrefix(line, []byte(exactly)) {
 		ret.exactly = true
-		line = line[:len(exactly)]
+		line = line[len(exactly):]
 	} else {
 		return nil, err
 	}
 
 	// parse stops
-	idx := bytes.Index(line, []byte{'.'})
-	if idx == -1 || idx != len(line)-1 {
+	idx := bytes.Index(line, []byte(" stops."))
+	if idx == -1 {
 		return nil, err
 	}
 	ret.stops, err = strconv.Atoi(string(line[:idx]))
@@ -285,9 +302,9 @@ func ParseQuest2(line []byte) (*Quest2, error) {
 func SolveQuest2(input *Quest2, num int, g *Graph) {
 	within, exactly := BruteForceNStops(g, input.stops, input.start, input.end)
 	if input.exactly {
-		fmt.Println("Output #%d: %d\n", num, exactly)
+		fmt.Printf("Output #%d: %d\n", num, exactly)
 	} else {
-		fmt.Println("Output #%d: %d\n", num, within)
+		fmt.Printf("Output #%d: %d\n", num, within)
 	}
 }
 
@@ -295,7 +312,7 @@ func SolveQuest1(input []byte, num int, g *Graph) {
 	start := input[0]
 	current, ok := g.Name2Vertex[start]
 	if !ok {
-		fmt.Errorf("I have no idea what you are talking about")
+		fmt.Printf("I have no idea what you are talking about")
 		return
 	}
 
@@ -304,7 +321,7 @@ func SolveQuest1(input []byte, num int, g *Graph) {
 		name := input[i]
 		next, ok := g.Name2Vertex[name]
 		if !ok {
-			fmt.Errorf("I have no idea what you are talking about")
+			fmt.Printf("I have no idea what you are talking about")
 			return
 		}
 
@@ -323,7 +340,7 @@ func SolveQuest1(input []byte, num int, g *Graph) {
 			return
 		}
 	}
-	fmt.Println("Output #%d: %d\n", num, result)
+	fmt.Printf("Output #%d: %d\n", num, result)
 	return
 }
 
