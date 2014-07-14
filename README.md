@@ -1,3 +1,5 @@
+thoughtworks的编程测试，题目是trains，挂了，这是我提交的代码。
+
 # build
 
 first, [you need a golang envirenment](http://golang.org)
